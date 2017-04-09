@@ -19,10 +19,10 @@ namespace ConnectFour.Tests
             int col = 5;
 
             // act
-            var board = new Board(row, col);
+            var game = new Game(row, col);
 
             // assert
-            Assert.IsTrue(board.IsReady);
+            Assert.IsTrue(game.GameBoard.IsReady);
         }
 
         [TestMethod]
@@ -35,7 +35,7 @@ namespace ConnectFour.Tests
             int col = 0;
 
             // act
-            var board = new Board(row, col);
+            var game = new Game(row, col);
         }
 
         [TestMethod]
@@ -43,10 +43,10 @@ namespace ConnectFour.Tests
         {
             // assign
             int column = 1;
-            Board board = CreateBoard(5,5);
+            Game game = CreateGame(5,5);
 
             // act
-            var result = board.PlaceMarker("y", column);
+            var result = game.PlaceMarker("y", column);
 
             // assert
             Assert.IsInstanceOfType(result, typeof(Marker));
@@ -56,11 +56,11 @@ namespace ConnectFour.Tests
         public void PlacingAPieceInASpecificColumn_ReturnsAMarker_WithCorrectColumnNumber()
         {
             // assign
-            Board board = CreateBoard(5, 5);
+            Game game = CreateGame(5, 5);
             var expected = new Marker { Colour = "y", Column = 3, Row = 1 };
 
             // act
-            var result = board.PlaceMarker(expected.Colour, expected.Column);
+            var result = game.PlaceMarker(expected.Colour, expected.Column);
 
             // assert
             Assert.AreEqual(expected.Column, result.Column);
@@ -70,11 +70,11 @@ namespace ConnectFour.Tests
         public void PlacingAPieceInAColumn_ReturnsAMarker_WithCorrectRowNumber()
         {
             // assign
-            Board board = CreateBoard(5, 5);
+            Game game = CreateGame(5, 5);
             var expected = new Marker { Colour = "y", Column = 1, Row = 1 };
             
             // act
-            var result = board.PlaceMarker(expected.Colour, expected.Column);
+            var result = game.PlaceMarker(expected.Colour, expected.Column);
 
             // assert
             Assert.AreEqual(expected.Row, result.Row);
@@ -84,11 +84,11 @@ namespace ConnectFour.Tests
         public void PlacingAPieceInAColumn_ReturnsTheCorrectMarker()
         {
             // assign
-            Board board = CreateBoard(5, 5);
+            Game game = CreateGame(5, 5);
             var expected = new Marker { Colour = "y", Column = 1, Row = 1 };
 
             // act
-            var result = board.PlaceMarker(expected.Colour, expected.Column);
+            var result = game.PlaceMarker(expected.Colour, expected.Column);
 
             // assert
             Assert.AreEqual(expected, result);
@@ -98,37 +98,37 @@ namespace ConnectFour.Tests
         public void PlacingAPiecesVerticalyInAColumn_SetsTheAppropriateRowNumber()
         {
             // assign
-            Board board = CreateBoard(5, 5);
+            Game game = CreateGame(5, 5);
             int col = 1;
             var marker = new Marker();
 
             // act
-            for (int i = 0; i < board.Rows; i++)
+            for (int i = 0; i < game.GameBoard.Rows; i++)
             {
                 // alternate between red and yellow.
-                marker = board.PlaceMarker(i % 2 == 0 ? "y" : "r", col);
+                marker = game.PlaceMarker(i % 2 == 0 ? "y" : "r", col);
             }
 
             // assert
-            Assert.AreEqual(board.Rows, marker.Row);
+            Assert.AreEqual(game.GameBoard.Rows, marker.Row);
         }
 
         [TestMethod]
         public void Placing4PiecesVertically_WinsTheGame()
         {
             // assign
-            Board board = CreateBoard(5, 5);
+            Game game = CreateGame(5, 5);
             int col = 1;
             var marker = new Marker();
 
             // act
             for (int i = 0; i < 4; i++)
             {
-                marker = board.PlaceMarker("r", col);
+                marker = game.PlaceMarker("r", col);
             }
 
             // assert
-            Assert.IsTrue(board.IsWon);
+            Assert.IsTrue(game.IsWon);
         }
 
 
@@ -136,39 +136,199 @@ namespace ConnectFour.Tests
         public void Placing3PiecesVertically_DoesNotWinTheGame()
         {
             // assign
-            Board board = CreateBoard(5, 5);
+            Game game = CreateGame(5, 5);
             int col = 1;
             var marker = new Marker();
 
             // act
             for (int i = 0; i < 3; i++)
             {
-                marker = board.PlaceMarker("r", col);
+                marker = game.PlaceMarker("r", col);
             }
             // opponent blocks streak
-            board.PlaceMarker("y", col);
+            game.PlaceMarker("y", col);
 
-            board.PlaceMarker("r", col);
+            game.PlaceMarker("r", col);
 
             // assert
-            Assert.IsFalse(board.IsWon);
+            Assert.IsFalse(game.IsWon);
         }
 
         [TestMethod]
         public void Placing4PiecesHorizontally_WinsTheGame()
         {
             // assign
-            Board board = CreateBoard(5, 5);
+            Game game = CreateGame(5, 5);
             var marker = new Marker();
 
             // act
             for (int i = 1; i < 5; i++)
             {
-                marker = board.PlaceMarker("r",i);
+                marker = game.PlaceMarker("r",i);
             }
 
             // assert
-            Assert.IsTrue(board.IsWon);
+            Assert.IsTrue(game.IsWon);
+        }
+
+        [TestMethod]
+        public void Placing3PiecesHorizontally_DoesNotWinTheGame()
+        {
+            // assign
+            Game game = CreateGame(5, 5);
+            var marker = new Marker();
+
+            // act
+            for (int i = 1; i < 4; i++)
+            {
+                marker = game.PlaceMarker("r", i);
+            }
+            // opponent blocks streak
+            marker = game.PlaceMarker("y", 4);
+
+            marker = game.PlaceMarker("r", 5);
+
+            // assert
+            Assert.IsFalse(game.IsWon);
+        }
+
+        [TestMethod]
+        public void Placing4PiecesDiagonallyUpward_WinsTheGame()
+        {
+            // assign
+            Game game = CreateGame(5, 5);
+            var marker = new Marker();
+
+            // act
+
+            // first column
+            marker = game.PlaceMarker("r", 1);
+
+            // second column
+            marker = game.PlaceMarker("y", 2);
+            marker = game.PlaceMarker("r", 2);
+
+            // third
+            marker = game.PlaceMarker("y", 3);
+            marker = game.PlaceMarker("y", 3);
+            marker = game.PlaceMarker("r", 3);
+
+            // forth
+            marker = game.PlaceMarker("y", 4);
+            marker = game.PlaceMarker("y", 4);
+            marker = game.PlaceMarker("y", 4);
+            marker = game.PlaceMarker("r", 4);
+
+            // assert
+            Assert.IsTrue(game.IsWon);
+        }
+
+        [TestMethod]
+        public void Placing3PiecesDiagonallyUpward_DoesNotWinTheGame()
+        {
+            // assign
+            Game game = CreateGame(5, 5);
+            var marker = new Marker();
+
+            // act
+
+            // first column
+            marker = game.PlaceMarker("r", 1);
+
+            // second column
+            marker = game.PlaceMarker("y", 2);
+            marker = game.PlaceMarker("r", 2); 
+
+            // third
+            marker = game.PlaceMarker("y", 3);
+            marker = game.PlaceMarker("y", 3);
+            marker = game.PlaceMarker("y", 3); // streak interupted
+
+            // forth
+            marker = game.PlaceMarker("r", 4);
+            marker = game.PlaceMarker("y", 4);
+            marker = game.PlaceMarker("y", 4);
+            marker = game.PlaceMarker("r", 4);
+
+            // fifth
+            marker = game.PlaceMarker("y", 5);
+            marker = game.PlaceMarker("y", 5);
+            marker = game.PlaceMarker("y", 5);
+            marker = game.PlaceMarker("r", 5);
+            marker = game.PlaceMarker("r", 5);
+
+            // assert
+            Assert.IsFalse(game.IsWon);
+        }
+
+        [TestMethod]
+        public void Placing4PiecesDiagonallyDownward_WinsTheGame()
+        {
+            // assign
+            Game game = CreateGame(5, 5);
+            var marker = new Marker();
+
+            // act
+            // forth
+            marker = game.PlaceMarker("r", 4);
+
+
+            // second column
+            marker = game.PlaceMarker("y", 2);
+            marker = game.PlaceMarker("y", 2);
+            marker = game.PlaceMarker("r", 2);
+
+
+            // third
+            marker = game.PlaceMarker("y", 3);
+            marker = game.PlaceMarker("r", 3);
+
+            // first column
+            marker = game.PlaceMarker("y", 1);
+            marker = game.PlaceMarker("y", 1);
+            marker = game.PlaceMarker("y", 1);
+            marker = game.PlaceMarker("r", 1);
+
+            // assert
+            Assert.IsTrue(game.IsWon);
+        }
+
+        [TestMethod]
+        public void Placing3PiecesDiagonallyDownward_DoesNotWinTheGame()
+        {
+            // assign
+            Game game = CreateGame(5, 5);
+            var marker = new Marker();
+
+            // act
+
+            // first column
+            marker = game.PlaceMarker("y", 1);
+            marker = game.PlaceMarker("y", 1);
+            marker = game.PlaceMarker("r", 1);
+            marker = game.PlaceMarker("y", 1);
+            marker = game.PlaceMarker("r", 1);
+
+            // second column
+            marker = game.PlaceMarker("r", 2);
+            marker = game.PlaceMarker("y", 2);
+            marker = game.PlaceMarker("y", 2);
+            marker = game.PlaceMarker("r", 2);
+
+            // third
+            marker = game.PlaceMarker("y", 3);
+            marker = game.PlaceMarker("r", 3);
+            marker = game.PlaceMarker("r", 3);
+
+            // forth
+            marker = game.PlaceMarker("r", 4);
+            marker = game.PlaceMarker("y", 4); // streak interupted
+
+            // fifth
+            marker = game.PlaceMarker("r", 5);
+
+            // assert
+            Assert.IsFalse(game.IsWon);
         }
 
         [TestMethod]
@@ -176,11 +336,11 @@ namespace ConnectFour.Tests
         public void PlacingAPieceInAnInvalidColumn_ThrowsAnException()
         {
             // assign
-            Board board = CreateBoard(5, 5);
+            Game game = CreateGame(5, 5);
             int col = 6;
 
             // act
-            var result = board.PlaceMarker("y",col);
+            var result = game.PlaceMarker("y",col);
         }
 
         [TestMethod]
@@ -188,11 +348,11 @@ namespace ConnectFour.Tests
         public void PlacingAPieceInAnNegativeColumn_ThrowsAnException()
         {
             // assign
-            Board board = CreateBoard(5, 5);
+            Game game = CreateGame(5, 5);
             int col = -1;
 
             // act
-            var result = board.PlaceMarker("y", col);
+            var result = game.PlaceMarker("y", col);
         }
 
         [TestMethod]
@@ -200,20 +360,20 @@ namespace ConnectFour.Tests
         public void PlacingAPieceInAFullColumn_ThrowsAnException()
         {
             // assign
-            Board board = CreateBoard(5, 5);
+            Game game = CreateGame(5, 5);
             int col = 1;
 
             // act - add too many markers to the column
-            for (int i = 0; i < board.Columns+1; i++)
+            for (int i = 0; i < game.GameBoard.Columns+1; i++)
             {
-                board.PlaceMarker("y", col);
+                game.PlaceMarker("y", col);
             }
         }
 
-        private static Board CreateBoard(int row, int col)
+        private static Game CreateGame(int row, int col)
         {
-            var board = new Board(row, col);
-            return board;
+            var game = new Game(row, col);
+            return game;
         }
 
         //Scenario One (Yellow wins - Horizontal)
