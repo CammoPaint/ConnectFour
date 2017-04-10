@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 
 namespace ConnectFour.Domain
 {
+    /// <summary>
+    /// Represents a single game of ConnectFour
+    /// </summary>
     public class Game
     {
         public Game(int Rows, int Columns)
         {
+            // initialise the game board
             GameBoard = new Board(Rows, Columns);
         }
 
@@ -17,6 +21,13 @@ namespace ConnectFour.Domain
         
         public bool IsWon { get; set; }
 
+        /// <summary>
+        /// Adds a Marker to the specified column
+        /// Throw Exception if the column is full
+        /// </summary>
+        /// <param name="Colour">Colour of the Marker</param>
+        /// <param name="Column">Column to add the Marker to</param>
+        /// <returns>The newy created Marker</returns>
         public Marker PlaceMarker(string Colour, int Column)
         {
             // check that the column to place the marker is valid
@@ -29,7 +40,7 @@ namespace ConnectFour.Domain
 
             for (int i = 0; i < GameBoard.BoardMarkers.GetLength(0); i++)
             {
-                // find the first empty
+                // find the first empty row in this column
                 if (GameBoard.BoardMarkers[i, column] == null)
                 {
                     // place the marker here
@@ -46,6 +57,12 @@ namespace ConnectFour.Domain
             // no empty slots found in this column
             throw new ArgumentException("This column is full.");
         }
+
+        /// <summary>
+        /// Check if this Marker completes a sequence of 4-Markers, thereby winning the Game
+        /// </summary>
+        /// <param name="marker"></param>
+        /// <returns>True if 4 Markers of matching colour are found</returns>
         private bool CheckMarkerWinsGame(Marker marker)
         {
             bool isFour = false;
@@ -69,13 +86,18 @@ namespace ConnectFour.Domain
 
         }
 
+        /// <summary>
+        /// Check four in a row vertically
+        /// </summary>
+        /// <param name="marker"></param>
+        /// <returns>True if 4 Markers of matching colour are found</returns>
         private bool CheckVerticalMarkers(Marker marker)
         {
             List<Marker> markers = new List<Marker>();
 
             int column = marker.Column - 1;
 
-            // 4 in a row vertically
+            // get all Markers in this column for the given colour
             for (int i = 0; i < GameBoard.BoardMarkers.GetLength(0); i++)
             {
                 if (GameBoard.BoardMarkers[i, column] != null && GameBoard.BoardMarkers[i, column].Colour == marker.Colour)
@@ -90,13 +112,19 @@ namespace ConnectFour.Domain
 
         }
 
+
+        /// <summary>
+        /// Check four in a row horizontally
+        /// </summary>
+        /// <param name="marker"></param>
+        /// <returns>True if 4 Markers of matching colour are found</returns>
         private bool CheckHorizontalMarkers(Marker marker)
         {
             List<Marker> markers = new List<Marker>();
-
-            // 4 in a row horizontally
+            
             int row = marker.Row - 1;
 
+            // get all Markers in this row for the given colour
             for (int i = 0; i < GameBoard.BoardMarkers.GetLength(1); i++)
             {
                 if (GameBoard.BoardMarkers[row, i] != null && GameBoard.BoardMarkers[row, i].Colour == marker.Colour)
@@ -110,6 +138,11 @@ namespace ConnectFour.Domain
             return false;
         }
 
+        /// <summary>
+        /// Check four in a row diagonally
+        /// </summary>
+        /// <param name="marker"></param>
+        /// <returns>True if 4 Markers of matching colour are found</returns>
         private bool CheckDiagonalMarkers(Marker marker)
         {
 
@@ -138,12 +171,25 @@ namespace ConnectFour.Domain
 
         }
 
+        /// <summary>
+        /// Confirm Marker exists at the supplied position
+        /// </summary>
+        /// <param name="Row"></param>
+        /// <param name="Column"></param>
+        /// <returns>True if the Marker exists</returns>
         private bool MarkerExists(int Row, int Column)
         {
             return Column >= 0 && Column < GameBoard.Columns && Row >= 0 && Row < GameBoard.Rows;
         }
 
-
+        /// <summary>
+        /// Loop through the Marker array to find matching coloured Markers
+        /// </summary>
+        /// <param name="Row">The current Row</param>
+        /// <param name="Column">The current Column</param>
+        /// <param name="Marker">The Marker to match colour with</param>
+        /// <param name="Delta">The Row,Column offset values to use when moving through the array</param>
+        /// <returns>Total number of Markers matching the colour</returns>
         private int Loop(int Row, int Column, Marker Marker, int[] Delta)
         {
             int recordsFound = 0;
@@ -157,28 +203,13 @@ namespace ConnectFour.Domain
                 {
                     break;
                 }
+                // increment or decrement the Row/Column values
                 Row+= Delta[0];
                 Column += Delta[1];
             }
 
             return recordsFound;
         }
-
-        private bool PreviousMarker(int Row, int Column, string Colour)
-        {
-            if (Column > GameBoard.Columns && Row > GameBoard.Rows)
-            {
-                // check the next marker diagonally below
-                var markerBelow = GameBoard.BoardMarkers[Row - 1, Column - 1];
-                if (markerBelow != null && markerBelow.Colour == Colour)
-                {
-                    // matching
-                    return true;
-                }
-            }
-            return false;
-        }
-
 
     }
 }

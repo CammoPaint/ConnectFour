@@ -55,8 +55,6 @@ namespace ConnectFour
                 Console.WriteLine($"{player} has won, press eny key to exit.");
                 Console.ReadKey();
             }
-                
-
         }
         static void DisplayGameBoard(Game game)
         {
@@ -67,9 +65,9 @@ namespace ConnectFour
                 {
                     var marker = game.GameBoard.BoardMarkers[i,j];
                     if (marker == null)
-                        Console.Write(0);
+                        Console.Write(0); // display a zero when there is no marker yet
                     else
-                        Console.Write(marker.Colour.Substring(0, 1));
+                        Console.Write(marker.Colour.Substring(0, 1)); // display the first letter of the colour
                     Console.Write(" ");
                 }
                 Console.WriteLine();

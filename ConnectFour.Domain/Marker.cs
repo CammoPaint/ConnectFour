@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ConnectFour.Domain
 {
+    /// <summary>
+    /// Represents a single marker used in a game of ConnectFour
+    /// </summary>
     public class Marker : IEquatable<Marker>
     {
         public int Column { get; set; }
@@ -17,6 +20,11 @@ namespace ConnectFour.Domain
             return this.Equals(obj as Marker);
         }
 
+        /// <summary>
+        /// Configure Equals for use in testing that the correct Marker is returned
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(Marker other)
         {
             return this.Colour.Equals(other.Colour) &&

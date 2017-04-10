@@ -4,6 +4,13 @@ using ConnectFour.Domain;
 
 namespace ConnectFour.Tests
 {
+    //Scenario One (Yellow wins - Horizontal)
+    //Scenario Two(Red wins - Vertical)
+    //Scenario Three(Yellow wins diagonal)
+    //Scenario Four(Draw)
+    //Scenario Five(Invalid board dimensions)
+    //Scenario Six(Invalid move)
+
     [TestClass]
     public class GameTests
     {
@@ -370,17 +377,27 @@ namespace ConnectFour.Tests
             }
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException), "All columns are full.")]
+        public void FillingAllColumns_ThrowsAnException()
+        {
+            // assign
+            Game game = CreateGame(5, 5);
+
+            // act - add too many markers to the column
+            for (int i = 0; i < game.GameBoard.Columns; i++)
+            {
+                for (int j = 0; j < game.GameBoard.Rows; j++)
+                {
+                    game.PlaceMarker(i % 2 == 0 ? "y" : "r", i);
+                }
+            }
+        }
+
         private static Game CreateGame(int row, int col)
         {
             var game = new Game(row, col);
             return game;
         }
-
-        //Scenario One (Yellow wins - Horizontal)
-        //Scenario Two(Red wins - Vertical)
-        //Scenario Three(Yellow wins diagonal)
-        //Scenario Four(Draw)
-        //Scenario Five(Invalid board dimensions)
-        //Scenario Six(Invalid move)
     }
 }
