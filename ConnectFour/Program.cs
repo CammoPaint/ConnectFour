@@ -11,24 +11,24 @@ namespace ConnectFour
     {
         enum Player
         {
-            Yellow = 0,
-            Red = 1
+            Yellow = 1,
+            Red = 0
         }
+
         static void Main(string[] args)
         {
             // start a new game based on board size
 
             Console.WriteLine("Welcome to ConnectFour");
-            Console.Write("Please enter the size of the board (Row,Columns): ");
+            Console.WriteLine("Please enter the board dimensions (number of rows, number of columns)");
             var boardDimensions = Console.ReadLine();
-            // attempt to split the board dimensions
-            var dimensions = boardDimensions.Split(',');
+            // attempt to split the board dimensions on either a space or comma
+            var dimensions = boardDimensions.Split(',', ' ');
 
             // initialize game
             Game game = new Game(int.Parse(dimensions[0]), int.Parse(dimensions[1]));
 
-            Console.WriteLine($"To place your token enter a column number between 1 & {dimensions[1]}. Press any key to play.");
-            Console.ReadKey();
+            DisplayGameBoard(game);
 
             int turn = 1;
             Player player= Player.Yellow;
@@ -36,7 +36,7 @@ namespace ConnectFour
             while (!game.IsWon)
             {
                 player = (Player)(turn % 2);
-                Console.Write($"{player}'s Turn: ");
+                Console.WriteLine($"{player}'s Turn: ");
                 var column = Console.ReadLine();
                 try
                 {
@@ -49,12 +49,17 @@ namespace ConnectFour
                 {
                     Console.WriteLine(ex.Message);
                 }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine($"{ex.Message} It's a draw (press eny key to exit)");
+                    break;
+                }
             }
             if (game.IsWon)
             {
-                Console.WriteLine($"{player} has won, press eny key to exit.");
-                Console.ReadKey();
+                Console.WriteLine($"{player} WINS! (press eny key to exit)");
             }
+            Console.ReadKey();
         }
         static void DisplayGameBoard(Game game)
         {
@@ -65,16 +70,14 @@ namespace ConnectFour
                 {
                     var marker = game.GameBoard.BoardMarkers[i,j];
                     if (marker == null)
-                        Console.Write(0); // display a zero when there is no marker yet
+                        Console.Write("o"); // display an o when there is no marker yet
                     else
-                        Console.Write(marker.Colour.Substring(0, 1)); // display the first letter of the colour
+                        Console.Write(marker.Colour.Substring(0, 1).ToLower()); // display the first letter of the colour
                     Console.Write(" ");
                 }
                 Console.WriteLine();
             }
         }
-
-
 
     }
 }

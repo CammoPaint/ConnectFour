@@ -31,20 +31,18 @@ namespace ConnectFour.Domain
         public Marker PlaceMarker(string Colour, int Column)
         {
             // check that the column to place the marker is valid
-            if (Column > GameBoard.BoardMarkers.GetLength(0) || Column < 1)
+            if (Column > GameBoard.Columns || Column < 1)
                 throw new ArgumentException("This is not a valid column.");
 
-            int column = Column - 1;
+                int column = Column - 1;
 
-            var marker = new Marker { Colour = Colour, Column = Column };
-
-            for (int i = 0; i < GameBoard.BoardMarkers.GetLength(0); i++)
+            for (int i = 0; i < GameBoard.Rows; i++)
             {
                 // find the first empty row in this column
                 if (GameBoard.BoardMarkers[i, column] == null)
                 {
                     // place the marker here
-                    marker.Row = i + 1;
+                    var marker = new Marker { Colour = Colour, Column = Column, Row = i + 1 };
                     GameBoard.BoardMarkers[i, column] = marker;
 
                     // check if this move wins the game
@@ -54,10 +52,31 @@ namespace ConnectFour.Domain
                 }
             }
 
-            // no empty slots found in this column
-            throw new ArgumentException("This column is full.");
+            // no empty slots found in this column check that other columns are available
+            AllColumnsAreFull();
+
+            throw new ArgumentOutOfRangeException("This column is full.");
         }
 
+        private bool AllColumnsAreFull()
+        {
+
+            for (int i = 0; i < GameBoard.Columns; i++)
+            {
+                Console.WriteLine(i);
+                // at least one empty row exist
+                if (GameBoard.BoardMarkers[GameBoard.Rows - 1, i] == null)
+                {
+                    return false;
+                }
+
+            }
+            // all columns are full
+            throw new InvalidOperationException("All columns are full.");
+
+
+
+        }
         /// <summary>
         /// Check if this Marker completes a sequence of 4-Markers, thereby winning the Game
         /// </summary>
@@ -98,7 +117,7 @@ namespace ConnectFour.Domain
             int column = marker.Column - 1;
 
             // get all Markers in this column for the given colour
-            for (int i = 0; i < GameBoard.BoardMarkers.GetLength(0); i++)
+            for (int i = 0; i < GameBoard.Rows; i++)
             {
                 if (GameBoard.BoardMarkers[i, column] != null && GameBoard.BoardMarkers[i, column].Colour == marker.Colour)
                     markers.Add(GameBoard.BoardMarkers[i, column]);
@@ -125,7 +144,7 @@ namespace ConnectFour.Domain
             int row = marker.Row - 1;
 
             // get all Markers in this row for the given colour
-            for (int i = 0; i < GameBoard.BoardMarkers.GetLength(1); i++)
+            for (int i = 0; i < GameBoard.Columns; i++)
             {
                 if (GameBoard.BoardMarkers[row, i] != null && GameBoard.BoardMarkers[row, i].Colour == marker.Colour)
                     markers.Add(GameBoard.BoardMarkers[row, i]);

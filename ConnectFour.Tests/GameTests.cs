@@ -102,10 +102,10 @@ namespace ConnectFour.Tests
         }
 
         [TestMethod]
-        public void PlacingAPiecesVerticalyInAColumn_SetsTheAppropriateRowNumber()
+        public void PlacingAPiecesVerticallyInAColumn_SetsTheAppropriateRowNumber()
         {
             // assign
-            Game game = CreateGame(5, 5);
+            Game game = CreateGame(3, 2);
             int col = 1;
             var marker = new Marker();
 
@@ -124,7 +124,7 @@ namespace ConnectFour.Tests
         public void Placing4PiecesVertically_WinsTheGame()
         {
             // assign
-            Game game = CreateGame(5, 5);
+            Game game = CreateGame(5, 1);
             int col = 1;
             var marker = new Marker();
 
@@ -143,7 +143,7 @@ namespace ConnectFour.Tests
         public void Placing3PiecesVertically_DoesNotWinTheGame()
         {
             // assign
-            Game game = CreateGame(5, 5);
+            Game game = CreateGame(5, 1);
             int col = 1;
             var marker = new Marker();
 
@@ -165,7 +165,7 @@ namespace ConnectFour.Tests
         public void Placing4PiecesHorizontally_WinsTheGame()
         {
             // assign
-            Game game = CreateGame(5, 5);
+            Game game = CreateGame(1, 5);
             var marker = new Marker();
 
             // act
@@ -363,35 +363,39 @@ namespace ConnectFour.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException), "This column is full.")]
+        [ExpectedException(typeof(ArgumentOutOfRangeException), "This column is full.")]
         public void PlacingAPieceInAFullColumn_ThrowsAnException()
         {
             // assign
-            Game game = CreateGame(5, 5);
+            Game game = CreateGame(3, 2);
             int col = 1;
 
             // act - add too many markers to the column
-            for (int i = 0; i < game.GameBoard.Columns+1; i++)
+            for (int i = 0; i < game.GameBoard.Rows+1; i++)
             {
                 game.PlaceMarker("y", col);
             }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException), "All columns are full.")]
+        [ExpectedException(typeof(InvalidOperationException), "All columns are full.")]
         public void FillingAllColumns_ThrowsAnException()
         {
             // assign
-            Game game = CreateGame(5, 5);
+            Game game = CreateGame(1, 1);
 
-            // act - add too many markers to the column
-            for (int i = 0; i < game.GameBoard.Columns; i++)
+            // act - fill all rows and column
+            for (int i = 1; i < game.GameBoard.Columns+1; i++)
             {
-                for (int j = 0; j < game.GameBoard.Rows; j++)
+                for (int j = 1; j < game.GameBoard.Rows+1; j++)
                 {
                     game.PlaceMarker(i % 2 == 0 ? "y" : "r", i);
                 }
             }
+
+            // add one more Marker
+            game.PlaceMarker("r", 1);
+
         }
 
         private static Game CreateGame(int row, int col)
